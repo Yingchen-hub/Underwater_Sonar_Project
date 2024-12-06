@@ -1,0 +1,81 @@
+This export contains two files: sonar.csv and bathymetry.csv
+- sonar.csv is generated with all scanning modes.
+- bathymetry.csv is generated only with following sonar scanning modes: Boat / Shore / Bait boat
+
+sonar.csv has the following columns:
+0      : Timestamp when this measurement was recorded. Timestamp will appear as the number of milliseconds that have elapsed since 00:00:00 Coordinated Universal Time (UTC), Thursday, 1 January 1970. (UNIX Time)
+1 - n  : Echo strength recorded at each depth. n depends on depth.
+         The deeper the water the more values will be in row.
+         Echo resolution depends on deeper model:
+• All Deeper CHIRP model series and PRO+2: Between 0 and 4096
+• Deeper PRO model series: Between 0 and 1600
+• Deeper START: Between 0 and 1600
+
+bathymetry.csv has the following columns:
+0      : Latitude
+1      : Longitude
+2      : Depth in meters
+3      : Timestamp when this measurement was recorded. Timestamp will appear as the number of milliseconds that have elapsed since 00:00:00 Coordinated Universal Time (UTC), Thursday, 1 January 1970. (UNIX Time)
+4      : Temperature measurement in C
+
+
+---/// sonar.csv and bathymetry.csv F.A.Q \\\---
+
+
+--- 1. Determining the factual depth from the sonar.csv file ---
+
+Depth between the water surface and the bottom is something you will need to define by yourself, depending on what you define as a bottom in your particular use case.
+
+When it comes to the total scanned depth, there are general rules you need to know in order to properly understand how it’s determined:
+
+• Deeper automatically determines the bottom, based on reflection strength and algorithms. Documentation of those algorithms is not disclosed to the public.
+• If Deeper detects the bottom, it will add 10 additional meters to the total scanning depth.
+• Amount of columns in the .csv file is related to meters per pixel and depth determined by the Deeper itself. Meters per pixel (scanning resolution) depends on the model:
+
+All Deeper CHIRP model series and PRO+2: 0.010407008 m. per cell
+Deeper PRO model series: 0.02738 m. per cell
+Deeper START: 0.03705 m. per cell
+
+EXAMPLE: if Deeper CHIRP series model determines that the bottom is at 3 meter depth, it will add 10 meters to the scanned depth. The number of columns will be (3m + 10m) / 0.010407008= 1249 columns.
+
+
+
+--- 2. How number of rows in the sonar.csv file is determined? ---
+
+Number of rows depends on total the time Deeper was scanning during a particular scanning session, as well as amount of scans (sonar pulses) per second. All Deeper CHIRP and PRO model series scan up to 15 times per second. Scanning rate (pulse rate) depends on depth:
+• When scanning shallow waters, scan rate will be higher.
+• When scanning deep waters, scan rate will be lower.
+• From 30-35 m. of depth, scanning rate will start to slow down. At 100 meters, it will be 3 scans (sonar pulses) per second.
+• If Deeper cannot detect the bottom, scan rate will be at its highest value.
+• Scanning rate is determined automatically and cannot be controlled.
+
+
+--- 3. Why there are rows with 0 latitude and longitude in bathymetry.csv ---
+
+Sonar records depth up to 15 times per second. GPS records latitude and longitude approximately every second (depends on quality of GPS fix). Thus, the amount of rows with just depth will be higher than the number of rows that have latitude+longitude+depth.
+
+
+--- 4. How to convert Unix timestamp to Date + Time (incl. seconds) format ---
+
+There are multiple ways you can convert timestamp to normal time. If you're using Microsoft Excel, you can use the following formula:
+
+=(D1/86400000)+DATE(1970;1;1)+(X/24)
+
+X= required time offset from GMT time. For example, if you're based in Lithuania and it's winter time (GMT+2), the formula would look like (2/24)
+
+Then, format Cell to "Custom", in "Type" yyyy-mm-dd hh:mm:ss
+
+
+
+
+---/// Good luck from the whole Deeper team! \\\---
+
+For support, please contact support@deeper.eu . We respond within 1 business day.
+
+For additional information about Sonar data export, please go to https://deepersonar.com/global/all/support/knowledgebase/entry/id/1246
+       __
+  ____/ /__  ___  ____  ___  _____
+ / __  / _ \/ _ \/ __ \/ _ \/ ___/
+/ /_/ /  __/  __/ /_/ /  __/ /
+\__,_/\___/\___/ .___/\___/_/
+              /_/
